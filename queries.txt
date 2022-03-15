@@ -1,0 +1,8 @@
+create database hotwaxSystem;
+USE hotwaxSystem;
+create table Salespeople(
+SNUM int PRIMARY KEY,
+SNAME varchar(255),
+CITY varchar(255),
+COMM int
+);

@@ -1,8 +1,85 @@
-create database hotwaxSystem;
+CREATE DATABASE hotwaxSystem;
+
 USE hotwaxSystem;
-create table Salespeople(
+
+CREATE TABLE SalesPeople(
 SNUM int PRIMARY KEY,
 SNAME varchar(255),
 CITY varchar(255),
 COMM int
 );
+
+CREATE TABLE Customers(
+CNUM int PRIMARY KEY,
+CNAME varchar(255),
+CITY varchar(255),
+RATING int,
+SNUM INT,
+FOREIGN KEY (SNUM) REFERENCES SalesPeople (SNUM)
+);
+
+CREATE TABLE Orders(
+ONUM int,
+AMT decimal(8,2),
+ODATE date,
+CNUM int,
+SNUM int,
+FOREIGN KEY (CNUM) REFERENCES Customers(CNUM),
+FOREIGN KEY (SNUM) REFERENCES SalesPeople(SNUM)
+);
+
+INSERT INTO SalesPeople VALUES 
+(1001,"Peel","London",12),
+(1001,"Serres","SanJose",13),
+(1004,"Motika","London",11),
+(1007,"Rifkn","Barcelona",15),
+(1003,"AxelRod","New York",10),
+(1008,"Fran","London",25);
+
+INSERT INTO Customers VALUES 
+(2001,"Hoffman","London",100,1001),
+(2002,"Giovanni","Rome",200,1003),
+(2003,"Liu","SanJose",200,1002),
+(2004,"Grass","Berlin",300,1002),
+(2005,"Clemens","London",100,1001),
+(2006,"Cisneros","SanJose",300,1007),
+(2007,"Pereira","Rome",100,1004);
+
+INSERT INTO Orders VALUES 
+(3001,18.69,'1990-10-03',2008,1007),
+(3003,767.19,'1990-10-03',2001,1001),
+(3002,1900.10,'1990-10-03',2007,1004),
+(3005,5160.45,'1990-10-03',2003,1002),
+(3006,1098.16,'1990-10-03',2008,1007),
+(3009,1713.23,'1990-10-03',2002,1003),
+(3007,75.75,'1990-10-03',2004,1002),
+(3008,4723.00,'1990-10-03',2006,1001),
+(3010,1309.95,'1990-10-03',2004,1002),
+(3011,9891.88,'1990-10-03',2006,1001);
+
+
+Questions--
+
+1) List all the columns of the Salespeople table. 
+A) SHOW COLUMNS FROM SalesPeople;
+
+2) List all customers with a rating of 100. 
+A) SELECT * FROM Customers WHERE rating = 100;
+
+3) Find the largest order taken by each salesperson on each date. 
+A) SELECT snum,odate,MAX(amt) FROM orders GROUP BY odate,snum;
+
+4) Arrange the Order table by descending customer number. 
+A) SELECT * FROM orders ORDER BY cnum DESC;
+
+5) Find which salespeople currently have orders in the order table. 
+A) 
+
+
+
+
+
+
+
+
+

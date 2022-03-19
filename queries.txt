@@ -73,7 +73,30 @@ A) SELECT snum,odate,MAX(amt) FROM orders GROUP BY odate,snum;
 A) SELECT * FROM orders ORDER BY cnum DESC;
 
 5) Find which salespeople currently have orders in the order table. 
-A) 
+A) SELECT cname FROM customers WHERE snum IN (SELECT snum FROM salespeople);
+
+6) List names of all customers matched with the salespeople serving them. 
+A) SELECT sname , snum FROM saleSpeople WHERE snum IN(SELECT snum FROM customers GROUP BY snum HAVING count(snum)>1);	
+
+7) Find the names and numbers of all salespeople who have more than one customer. 
+A) SELECT sname , snum FROM saleSpeople WHERE snum IN(SELECT snum FROM customers GROUP BY snum HAVING count(snum)>1);
+
+8) Count the orders of each of the salespeople and output the results in descending order. 
+A) SELECT count(onum), snum FROM Orders GROUP BY snum ORDER BY count(onum) DESC;
+
+
+9) List the customer table if and only if one or more of the customers in the Customer table are located in SanJose. 
+A) SELECT * FROM customers WHERE (SELECT count(*) FROM customers WHERE city='SanJose')>1;
+
+10) Match salespeople to customers according to what city they live in. 
+A) SELECT sname, cname, s.city FROM salespeople s,customers c where s.city=c.city;
+
+11) Find all the customers in SanJose who have a rating above 200. 
+A) SELECT cname FROM customers WHERE city ="SanJose" AND rating>200;
+
+12) List the names and commissions of all salespeople in London. 
+A) SELECT sname, comm FROM salespeople WHERE city="London"; 
+
 
 
 

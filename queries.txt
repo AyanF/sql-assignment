@@ -122,19 +122,41 @@ A) SELECT comm*100 AS comm  FROM salespeople;
 A) SELECT snum,odate,max(amt) FROM orders GROUP BY odate,snum HAVING max(amt)>3000;
 
 21) List all the largest orders for October 3, for each salesperson. 
-A) 
+A) SELECT b.sname, o.snum,o.odate,o.onum,o.amt FROM orders o, salespeople b, customers a WHERE odate='1990-10-03' AND a.snum=b.snum AND  a.snum=o.snum ORDER BY o.amt DESC;
 
 22) Find all customers located in cities where Serres has customers. 
-A)
+A) SELECT c.cname FROM customers c WHERE c.city = (SELECT c.city FROM customers c WHERE snum=(SELECT s.snum FROM salespeople s WHERE s.sname='Serres' )LIMIT 1);
 
 23) Select all customers with a rating above 200. 
-A)
+A) SELECT c.cname FROM customers c WHERE c.rating >200;
 
 24) Count the number of salespeople currently having orders in the orders table. 
-A)
+A) SELECT count(snum) FROM orders;
 	
 25) Write a query that produces all customers serviced by salespeople with a commission above 12%. Output the customer’s name, salesperson’s name and the salesperson’s rate of commission.
-A) 
+A) SELECT count(DISTINCT snum) FROM orders;
+
+26) Find salespeople who have multiple customers. 
+A) SELECT c.snum, count(c.snum) FROM customers c GROUP BY c.snum HAVING count(c.snum)>1;
+
+27) Find salespeople with customers located in their own cities. 
+A) SELECT DISTINCT s.sname FROM salespeople s, customers c WHERE c.snum=s.snum AND  c.city = s.city;
+
+28) Find all salespeople whose name starts with ‘P’ and fourth character is ‘I’. 
+A) SELECT s.sname FROM salespeople s WHERE s.sname LIKE 'p__i%';
+
+29) Write a query that uses a subquery to obtain all orders for the customer named ‘Cisneros’. Assume you do not know his customer number.
+A) SELECT o.onum FROM orders o WHERE o.cnum = (SELECT c.cnum FROM customers c WHERE c.cname='Cisneros');
+
+30) Find the largest orders for Serres and Rifkin. 
+A) SELECT snum,max(amt) FROM orders GROUP BY snum  HAVING snum IN(SELECT snum FROM salespeople WHERE sname='Serres' OR sname='Rifkin');
+
+31) Sort the salespeople table in the following order: snum, sname, commission, city. 
+32) Select all customers whose names fall in between ‘A’ and ‘G’ alphabetical range. 
+33) Select all the possible combinations of customers you can assign. 
+34) Select all orders that are greater than the average for October 4. 
+35) Write a select command using correlated subquery that selects the names and numbers of all customers with ratings equal to the maximum for their city. 
+
 
 
 

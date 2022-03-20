@@ -29,12 +29,12 @@ FOREIGN KEY (SNUM) REFERENCES SalesPeople(SNUM)
 );
 
 INSERT INTO SalesPeople VALUES 
-(1001,"Peel","London",12),
-(1001,"Serres","SanJose",13),
-(1004,"Motika","London",11),
-(1007,"Rifkn","Barcelona",15),
-(1003,"AxelRod","New York",10),
-(1008,"Fran","London",25);
+(1001,"Peel","London",.12),
+(1001,"Serres","SanJose",.13),
+(1004,"Motika","London",.11),
+(1007,"Rifkn","Barcelona",.15),
+(1003,"AxelRod","New York",.10),
+(1008,"Fran","London",.25);
 
 INSERT INTO Customers VALUES 
 (2001,"Hoffman","London",100,1001),
@@ -96,6 +96,45 @@ A) SELECT cname FROM customers WHERE city ="SanJose" AND rating>200;
 
 12) List the names and commissions of all salespeople in London. 
 A) SELECT sname, comm FROM salespeople WHERE city="London"; 
+
+13) List all the orders of Salesperson Motika from the orders table.
+A) SELECT  a.onum, a.amt, a.odate from Orders a WHERE snum=(SELECT snum FROM salespeople WHERE sname='Motika');
+
+14) Find all customers who booked orders on October 3. 
+A) SELECT c.cname FROM customers c LEFT JOIN orders o ON c.cnum = o.cnum WHERE o.odate ='1990-10-03';
+
+15) Give the sums of the amounts from the Orders table, grouped by date, eliminating all those dates where the SUM was not at least 2000 above the maximum Amount. 
+A) SELECT odate,sum(amt) FROM orders GROUP BY odate;
+
+16) Select all orders that had amounts that were greater than at least one of the orders from October 6. 
+A) SELECT o.onum FROM orders o WHERE o.amt> (SELECT amt FROM orders WHERE odate='1990-10-06' ORDER BY amt LIMIT 1);
+
+17) Write a query that uses the EXISTS operator to extract all salespeople who have customers with a rating of 300. 
+A) SELECT s.sname, s.snum FROM salespeople s WHERE EXISTS (SELECT cname FROM customers WHERE rating=300);
+
+18) Find all customers whose cnum is 1000 above the snum of Serres. 
+A) SELECT cnum,cname FROM customers WHERE cnum>1000+(SELECT snum FROM salespeople WHERE sname='serres');
+
+19) Give the salespeople’s commissions as percentages instead of decimal numbers. 
+A) SELECT comm*100 AS comm  FROM salespeople;
+
+20) Find the largest order taken by each salesperson on each date, eliminating those Maximum orders, which are less than 3000. 
+A) SELECT snum,odate,max(amt) FROM orders GROUP BY odate,snum HAVING max(amt)>3000;
+
+21) List all the largest orders for October 3, for each salesperson. 
+A) 
+
+22) Find all customers located in cities where Serres has customers. 
+A)
+
+23) Select all customers with a rating above 200. 
+A)
+
+24) Count the number of salespeople currently having orders in the orders table. 
+A)
+	
+25) Write a query that produces all customers serviced by salespeople with a commission above 12%. Output the customer’s name, salesperson’s name and the salesperson’s rate of commission.
+A) 
 
 
 

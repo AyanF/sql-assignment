@@ -384,6 +384,8 @@ A) SELECT o.onum,o.snum,s.city,o.odate,o.amt FROM orders o,salespeople s WHERE o
 107) Which salesperson is having lowest commission? 
 A) SELECT sname FROM salespeople WHERE comm = (SELECT min(comm) FROM salespeople);
 
+.
+
 
 
 

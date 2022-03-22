@@ -302,33 +302,87 @@ A) SELECT s.sname, s.city FROM salespeople s WHERE s.comm>0.10 AND s.city='londo
 80) Write a query that selects each customer’s smallest order. 
 A) SELECT c.cname, min(o.amt) FROM customers c, orders o WHERE  C.cnum=O.cnum  GROUP BY c.cname ORDER BY min(o.amt);
 
-81) Write a query that selects the first customer in alphabetical order whose name begins with ‘G’. 
-A)
+81) Write a query that selects the firsSELECT c.cname FROM customers c WHERE c.cname LIKE 'g%' ORDER BY c.cname;t customer in alphabetical order whose name begins with ‘G’. 
+A) SELECT c.cname FROM customers c WHERE c.cname LIKE 'g%' ORDER BY c.cname;
 
 82) Write a query that counts the number of different non NULL city values in the customers table. 
-83) Find the average amount from the Orders Table. 
-84) Find all customers who are not located in SanJose and whose rating is above 200. 
-85) Give a simpler way to write this query.SELECT snum, sname, city, comm FROM salespeople WHERE (comm > + 0.12 OR comm < 0.14); 86) Which salespersons attend to customers not in the city they have been assigned to? 
-87) Which salespeople get commission greater than 0.11 are serving customers rated less than 250? 
-88) Which salespeople have been assigned to the same city but get different commission percentages? 
-89) Which salesperson has earned the maximum commission? 
-90) Does the customer who has placed the maximum number of orders have the maximum rating? 
-91) List all customers in descending order of customer rating. 
-92) On which days has Hoffman placed orders? 
-93) Which salesmen have no orders between 10/03/1990 and 10/05/1990? 
-94) How many salespersons have succeeded in getting orders? 
-95) How many customers have placed orders? 
-96) On which date has each salesman booked an order of maximum value? 
-97) Who is the most successful salesperson? 
-98) Which customers have the same rating? 
-99) Find all orders greater than the average for October 4th. 
-100) List all customers with ratings above Grass’s average. 
-101) Which customers have above average orders? 
-102) Select the total amount in orders for each salesperson for which the total is greater than the amount of the largest order in the table. 103) Give names and numbers of all salespersons that have more than one customer? 
-104) Select all salespeople by name and number who have customers in their city whom they don’t service. 
-105) Does the total amount in orders by customer in Rome and London, exceed the commission paid to salesperson in London, and New York by more than 5 times? 
-106) Which are the date, order number, amt and city for each salesperson (by name) for themaximum order he has obtained? 107) Which salesperson is having lowest commission? 
+A) SELECT count(DISTINCT c.city) FROM customers c ;
 
+83) Find the average amount from the Orders Table. 
+A) SELECT AVG(o.amt) FROM orders o;
+
+84) Find all customers who are not located in SanJose and whose rating is above 200. 
+A) SELECT c.cname FROM customers c WHERE (c.rating > 200 AND city != 'sanjose');
+
+85) Give a simpler way to write this query.SELECT snum, sname, city, comm FROM salespeople WHERE (comm > + 0.12 OR comm < 0.14); 
+A) SELECT * FROM salespeople WHERE (comm>0.12 OR comm<0.14);
+
+86) Which salespersons attend to customers not in the city they have been assigned to? 
+A) SELECT a.sname,a.city,b.cname,b.city AS cus_city FROM salespeople a,customers b WHERE a.snum=b.snum AND a.city!=b.city;
+
+87) Which salespeople get commission greater than 0.11 are serving customers rated less than 250? 
+A) SELECT a.sname,a.comm,b.cname,b.rating FROM salespeople a,customerS b WHERE a.snum=b.snum AND (a.comm>0.12 AND b.rating<250);
+
+88) Which salespeople have been assigned to the same city but get different commission percentages? 
+A) SELECT sname,comm,city FROM salespeople WHERE city IN( SELECT city FROM salespeople GROUP BY city HAVING count(city) > 1)
+
+89) Which salesperson has earned the maximum commission? 
+A) SELECT sname FROM salespeople WHERE comm =( SELECT max(comm) FROM salespeople );
+
+90) Does the customer who has placed the maximum number of orders have the maximum rating? 
+A) SELECT count(*) as orders_count from customers a,orders b where a.cnum=b.cnum GROUP BY a.cnum ORDER BY a.rating DESC; 
+
+91) List all customers in descending order of customer rating. 
+A) SELECT cname FROM  customers ORDER BY DESC;
+
+92) On which days has Hoffman placed orders? 
+A) SELECT a.cname,b.onum,b.odate FROM customers a,orders b WHERE a.cnum=b.cnum AND a.cname='Hoffman';
+
+93) Which salesmen have no orders between 10/03/1990 and 10/05/1990? 
+A) SELECT  b.sname,c.odate FROM customers a,salespeople b,orders c WHERE a.snum=b.snum AND a.cnum=c.cnum AND odate NOT BETWEEN '1996-03-10' AND '1996-05-10';
+
+94) How many salespersons have succeeded in getting orders? 
+A) SELECT b.sname,c.onum,c.odate FROM customerS a,salespeople b,orders c WHERE a.snum=b.snum AND a.cnum=c.cnum;
+
+95) How many customers have placed orders? 
+A) SELECT count(DISTINCT cnum) FROM orders;
+
+96) On which date has each salesman booked an order of maximum value?
+A) SELECT odate FROM orders WHERE amt IN(SELECT max(amt) FROM orders GROUP BY snum);
+ 
+97) Who is the most successful salesperson? 
+A) SELECT sum(comm*amt*0.01) AS amt,sname FROM salespeople,orders GROUP BY sname ORDER BY amt DESC;
+
+98) Which customers have the same rating? 
+A) SELECT  c1.cname,c2.cname,c1.rating FROM customers c1,customers c2 WHERE c1.rating=c2.rating AND c1.cname!=c2.cname group by c1.cname, c2.cname,c1.rating ORDER BY c1.rating;
+
+99) Find all orders greater than the average for October 4th. 
+A) SELECT odate,AVG(amt) FROM orders WHERE odate!='1996-04-10' GROUP BY  odate;
+
+100) List all customers with ratings above Grass’s average. 
+A) SELECT  cname FROM customers WHERE rating >=(SELECT AVG(rating) FROM customers WHERE cname='grass');
+
+101) Which customers have above average orders? 
+A) SELECT * FROM orders WHERE amt> (SELECT AVG(amt)FROM orders);
+
+102) Select the total amount in orders for each salesperson for which the total is greater than the amount of the largest order in the table. 
+A) SELECT sum(amt),snum FROM orders GROUP BY snum HAVING sum(amt) >(SELECT max(amt) FROM orders);
+
+103) Give names and numbers of all salespersons that have more than one customer? 
+A) SELECT  sname,snum FROM salespeople WHERE snum IN (SELECT snum FROM customers GROUP BY snum HAVING count(snum)>1);
+
+104) Select all salespeople by name and number who have customers in their city whom they don’t service.
+A) SELECT a.sname,a.city,b.cname,b.city AS cus_city FROM  salespeople a,customers b WHERE a.snum=b.snum AND a.city!=b.city;
+ 
+105) Does the total amount in orders by customer in Rome and London, exceed the commission paid to salesperson in London, and New York by more than 5 times? 
+A) SELECT  (SELECT sum(a.amt*c.comm) AS totalsales FROM orders a,customers b,salespeople c WHERE a.cnum=b.cnum AND b.snum=c.snum AND (c.city='London' OR c.city='New York'))
+      AS A,(SELECT sum(a.amt) FROM orders a,customers b WHERE a.cnum=b.cnum AND (b.city='Rome' OR b.city='London')) AS B;
+
+106) Which are the date, order number, amt and city for each salesperson (by name) for themaximum order he has obtained? 
+A) SELECT o.onum,o.snum,s.city,o.odate,o.amt FROM orders o,salespeople s WHERE o.snum=s.snum AND amt IN(select max(amt) FROM orders GROUP BY  snum);
+
+107) Which salesperson is having lowest commission? 
+A) SELECT sname FROM salespeople WHERE comm = (SELECT min(comm) FROM salespeople);
 
 
 

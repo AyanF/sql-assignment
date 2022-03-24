@@ -41,8 +41,8 @@ INSERT INTO Customers VALUES
 (2002,"Giovanni","Rome",200,1003),
 (2003,"Liu","SanJose",200,1002),
 (2004,"Grass","Berlin",300,1002),
-(2005,"Clemens","London",100,1001),
-(2006,"Cisneros","SanJose",300,1007),
+(2006,"Clemens","London",100,1001),
+(2008,"Cisneros","SanJose",300,1007),
 (2007,"Pereira","Rome",100,1004);
 
 INSERT INTO Orders VALUES 
@@ -62,16 +62,18 @@ Questions--
 
 1) List all the columns of the Salespeople table. 
 
-A) SHOW COLUMNS FROM SalesPeople;
+A) SELECT * FROM salespeople;
++------+---------+-----------+------+
+| SNUM | SNAME   | CITY      | COMM |
++------+---------+-----------+------+
+| 1001 | Peel    | London    |   12 |
+| 1002 | Serres  | SanJose   |   13 |
+| 1003 | AxelRod | New York  |   10 |
+| 1004 | Motika  | London    |   11 |
+| 1007 | Rifkn   | Barcelona |   15 |
+| 1008 | Fran    | London    |   25 |
++------+---------+-----------+------+
 
-+-------+--------------+------+-----+---------+-------+
-| Field | Type         | Null | Key | Default | Extra |
-+-------+--------------+------+-----+---------+-------+
-| SNUM  | int(11)      | NO   | PRI | NULL    |       |
-| SNAME | varchar(255) | YES  |     | NULL    |       |
-| CITY  | varchar(255) | YES  |     | NULL    |       |
-| COMM  | int(11)      | YES  |     | NULL    |       |
-+-------+--------------+------+-----+---------+-------+
 
 
 2) List all customers with a rating of 100. 
@@ -89,21 +91,22 @@ A) SELECT * FROM Customers WHERE rating = 100;
 
 3) Find the largest order taken by each salesperson on each date.
  
-A) SELECT snum,odate,MAX(amt) FROM orders GROUP BY odate,snum;
+A)  SELECT a. sname,b.snum,b.odate,MAX(b.amt) FROM salespeople a,orders b WHERE a.snum = b.snum GROUP BY odate,snum;
 
-+------+------------+----------+
-| snum | odate      | MAX(amt) |
-+------+------------+----------+
-| 1001 | 1990-10-03 |   767.19 |
-| 1002 | 1990-10-03 |  5160.45 |
-| 1004 | 1990-10-03 |  1900.10 |
-| 1007 | 1990-10-03 |  1098.16 |
-| 1002 | 1990-10-04 |    75.75 |
-| 1003 | 1990-10-04 |  1713.23 |
-| 1001 | 1990-10-05 |  4723.00 |
-| 1001 | 1990-10-06 |  9891.88 |
-| 1002 | 1990-10-06 |  1309.95 |
-+------+------------+----------+
++---------+------+------------+------------+
+| sname   | snum | odate      | MAX(b.amt) |
++---------+------+------------+------------+
+| Peel    | 1001 | 1990-10-03 |     767.19 |
+| Serres  | 1002 | 1990-10-03 |    5160.45 |
+| Motika  | 1004 | 1990-10-03 |    1900.10 |
+| Rifkn   | 1007 | 1990-10-03 |    1098.16 |
+| Serres  | 1002 | 1990-10-04 |      75.75 |
+| AxelRod | 1003 | 1990-10-04 |    1713.23 |
+| Peel    | 1001 | 1990-10-05 |    4723.00 |
+| Peel    | 1001 | 1990-10-06 |    9891.88 |
+| Serres  | 1002 | 1990-10-06 |    1309.95 |
++---------+------+------------+------------+
+
 
 
 4) Arrange the Order table by descending customer number. 
@@ -168,18 +171,17 @@ A)SELECT sname,snum FROM salespeople  WHERE snum IN(SELECT snum FROM customers G
 
 8) Count the orders of each of the salespeople and output the results in descending order. 
 
-A) SELECT count(onum), snum FROM Orders GROUP BY snum ORDER BY count(onum) DESC;
+A) SELECT s.sname, count(o.onum), o.snum FROM salespeople s, orders o whereo.snum=s.snum  GROUP BY snum ORDER BY count(onum) DESC;
 
-+-------------+------+
-| count(onum) | snum |
-+-------------+------+
-|           3 | 1001 |
-|           3 | 1002 |
-|           2 | 1007 |
-|           1 | 1003 |
-|           1 | 1004 |
-+-------------+------+
-
++---------+---------------+------+
+| sname   | count(o.onum) | snum |
++---------+---------------+------+
+| Peel    |             3 | 1001 |
+| Serres  |             3 | 1002 |
+| Rifkn   |             2 | 1007 |
+| Motika  |             1 | 1004 |
+| AxelRod |             1 | 1003 |
++---------+---------------+------+
 
 9) List the customer table if and only if one or more of the customers in the Customer table are located in SanJose. 
 
@@ -252,28 +254,26 @@ A) SELECT  a.onum, a.amt, a.odate from Orders a WHERE snum=(SELECT snum FROM sal
 
 14) Find all customers who booked orders on October 3. 
 
-A) SELECT c.cname FROM customers c LEFT JOIN orders o ON c.cnum = o.cnum WHERE o.odate ='1990-10-03';
+A) SELECT DISTINCT c.cname FROM customers c LEFT JOIN orders o ON c.cnum = o.cnum WHERE o.odate ='1990-10-03';
 
-+---------+
-| cname   |
-+---------+
-| Hoffman |
-| Pereira |
-| Liu     |
-+---------+
++----------+
+| cname    |
++----------+
+| Cisneros |
+| Hoffman  |
+| Pereira  |
+| Liu      |
++----------+
 
 
 15) Give the sums of the amounts from the Orders table, grouped by date, eliminating all those dates where the SUM was not at least 2000 above the maximum Amount. 
 
-A) SELECT odate,sum(amt) FROM orders GROUP BY odate;
+A) SELECT odate,sum(amt) FROM orders GROUP BY odate HAVING sum(amt)>max(amt)+2000 ;
 
 +------------+----------+
 | odate      | sum(amt) |
 +------------+----------+
 | 1990-10-03 |  8944.59 |
-| 1990-10-04 |  1788.98 |
-| 1990-10-05 |  4723.00 |
-| 1990-10-06 | 11201.83 |
 +------------+----------+
 
 16) Select all orders that had amounts that were greater than at least one of the orders from October 6. 
@@ -351,19 +351,18 @@ A) SELECT snum,odate,max(amt) FROM orders GROUP BY odate,snum HAVING max(amt)>30
 
 21) List all the largest orders for October 3, for each salesperson. 
 
-A) SELECT b.sname, o.snum,o.odate,o.onum,o.amt FROM orders o, salespeople b, customers a WHERE odate='1990-10-03' AND a.snum=b.snum AND  a.snum=o.snum ORDER BY o.amt DESC;
+A) SELECT  DISTINCT b.sname, o.snum,o.odate,o.onum,o.amt FROM orders o, salespeople b, customers a WHERE odate='1990-10-03' AND a.snum=b.snum AND  a.snum=o.snum  ORDER BY o.amt DESC;
 
 +--------+------+------------+------+---------+
 | sname  | snum | odate      | onum | amt     |
 +--------+------+------------+------+---------+
 | Serres | 1002 | 1990-10-03 | 3005 | 5160.45 |
-| Serres | 1002 | 1990-10-03 | 3005 | 5160.45 |
 | Motika | 1004 | 1990-10-03 | 3002 | 1900.10 |
 | Rifkn  | 1007 | 1990-10-03 | 3006 | 1098.16 |
 | Peel   | 1001 | 1990-10-03 | 3003 |  767.19 |
-| Peel   | 1001 | 1990-10-03 | 3003 |  767.19 |
 | Rifkn  | 1007 | 1990-10-03 | 3001 |   18.69 |
 +--------+------+------------+------+---------+
+
 
 
 22) Find all customers located in cities where Serres has customers. 
@@ -389,13 +388,13 @@ A) SELECT c.cname FROM customers c WHERE c.rating >200;
 
 24) Count the number of salespeople currently having orders in the orders table. 
 
-A) SELECT count(snum) FROM orders;
+A) SELECT  count(DISTINCT snum) FROM orders;
 
-+-------------+
-| count(snum) |
-+-------------+
-|          10 |
-+-------------+
++----------------------+
+| count(DISTINCT snum) |
++----------------------+
+|                    5 |
++----------------------+
 	
 25) Write a query that produces all customers serviced by salespeople with a commission above 12%. Output the customer’s name, salesperson’s name and the salesperson’s rate of commission.
 
@@ -410,26 +409,29 @@ A) SELECT count(DISTINCT snum) FROM orders;
 
 26) Find salespeople who have multiple customers. 
 
-A) SELECT c.snum, count(c.snum) FROM customers c GROUP BY c.snum HAVING count(c.snum)>1;
+A) SELECT s.sname, c.snum, count(c.snum) FROM customers c,salespeople s WHERE s.snum = c.snum  GROUP BY c.snum HAVING count(c.snum)>1;
 
-+------+---------------+
-| snum | count(c.snum) |
-+------+---------------+
-| 1001 |             2 |
-| 1002 |             2 |
-+------+---------------+
++--------+------+---------------+
+| sname  | snum | count(c.snum) |
++--------+------+---------------+
+| Peel   | 1001 |             2 |
+| Serres | 1002 |             2 |
++--------+------+---------------+
+
 
 
 27) Find salespeople with customers located in their own cities. 
 
-A) SELECT DISTINCT s.sname FROM salespeople s, customers c WHERE c.snum=s.snum AND  c.city = s.city;
+A) SELECT DISTINCT s.sname,c.cname AS customer_name, s.city FROM salespeople s, customers c WHERE c.snum=s.snum AND  c.city = s.city;
 
-+--------+
-| sname  |
-+--------+
-| Peel   |
-| Serres |
-+--------+
++--------+---------------+---------+
+| sname  | customer_name | city    |
++--------+---------------+---------+
+| Peel   | Hoffman       | London  |
+| Serres | Liu           | SanJose |
+| Peel   | Clemens       | London  |
++--------+---------------+---------+
+
 
 28) Find all salespeople whose name starts with ‘P’ and fourth character is ‘I’. 
 
@@ -452,13 +454,16 @@ A) SELECT o.onum FROM orders o WHERE o.cnum = (SELECT c.cnum FROM customers c WH
 
 30) Find the largest orders for Serres and Rifkin. 
 
-A) SELECT snum,max(amt) FROM orders GROUP BY snum  HAVING snum IN(SELECT snum FROM salespeople WHERE sname='Serres' OR sname='Rifkin');
+A) SELECT  s.sname, o.snum, max(o.amt) FROM orders o, salespeople s WHERE o.snum=s.snum GROUP BY o.snum  HAVING o.snum IN(SELECT snum FROM salespeople WHERE sname='Serres' OR sname='Rifkn');
 
-+------+----------+
-| snum | max(amt) |
-+------+----------+
-| 1002 |  5160.45 |
-+------+----------+
++--------+------+------------+
+| sname  | snum | max(o.amt) |
++--------+------+------------+
+| Serres | 1002 |    5160.45 |
+| Rifkn  | 1007 |    1098.16 |
++--------+------+------------+
+
+
 
 31) Sort the salespeople table in the following order: snum, sname, commission, city. 
 
@@ -507,30 +512,38 @@ A) SELECT c.cname,s.sname FROM customers c JOIN salespeople s ON c.snum=s.snum;
 
 34) Select all orders that are greater than the average for October 4. 
 
-A) SELECT o.onum, o.amt FROM orders o WHERE o.amt > (SELECT AVG(o.amt) FROM orders o WHERE  o.odate ='1990-10-06'); 
+A) SELECT o.onum, o.amt FROM orders o WHERE o.amt > (SELECT AVG(o.amt) FROM orders o WHERE  o.odate ='1990-10-04'); 
 
 +------+---------+
 | onum | amt     |
 +------+---------+
+| 3002 | 1900.10 |
+| 3005 | 5160.45 |
+| 3006 | 1098.16 |
+| 3009 | 1713.23 |
+| 3008 | 4723.00 |
+| 3010 | 1309.95 |
 | 3011 | 9891.88 |
 +------+---------+
 
 
+
 35) Write a select command using correlated subquery that selects the names and numbers of all customers with ratings equal to the maximum for their city. 
 
-A) SELECT c.cnum,c.cname,c.rating FROM customers c WHERE c.rating IN (SELECT max(c.rating)FROM customers GROUP BY city);
+A)  SELECT c.cname, c.cnum, c.rating FROM customers as c WHERE c.cnum IN (SELECT Cnum FROM (SELECT Cnum,max(Rating) FROM customers GROUP BY city, cnum ) AS TEMPTABLE);
 
-+------+----------+--------+
-| cnum | cname    | rating |
-+------+----------+--------+
-| 2001 | Hoffman  |    100 |
-| 2002 | Giovanni |    200 |
-| 2003 | Liu      |    200 |
-| 2004 | Grass    |    300 |
-| 2005 | Clemens  |    100 |
-| 2006 | Cisneros |    300 |
-| 2007 | Pereira  |    100 |
-+------+----------+--------+
++----------+------+--------+
+| cname    | cnum | rating |
++----------+------+--------+
+| Hoffman  | 2001 |    100 |
+| Giovanni | 2002 |    200 |
+| Liu      | 2003 |    200 |
+| Grass    | 2004 |    300 |
+| Clemens  | 2006 |    100 |
+| Pereira  | 2007 |    100 |
+| Cisneros | 2008 |    300 |
++----------+------+--------+
+
 
 36) Write a query that totals the orders for each day and places the results in descending order. 
 

@@ -610,6 +610,9 @@ A) SELECT max(rating),city FROM customers GROUP BY city;
 |         300 | SanJose |
 +-------------+---------+
 
+
+<re view>
+
 41) Write a query that calculates the amount of the salesperson’s commission on each order by a customer with a rating above 100.00.
 
 A) SELECT s.sname,comm*amt FROM salespeople s,orders WHERE s.snum IN(SELECT snum FROM customers WHERE rating > 100);
@@ -685,25 +688,21 @@ A) SELECT a.sname,a.snum FROM salespeople a,(SELECT snum,count(*) AS cust_count 
 | Rifkn   | 1007 |
 +---------+------+
 
+<re view>
+
 45) Write a query that joins the Customer table to itself to find all pairs or customers served by a single salesperson.
 
-A) SELECT  a.cname,b.cname,c.sname FROM customers a,customers b,salespeople c WHERE a.snum=b.snum AND a.snum=c.snum;
+A) SELECT c.cname, c2.cname FROM customers c,customers c2 WHERE c.snum=c2.snum AND c.cname!=c2.cname ;
 
-+----------+----------+---------+
-| cname    | cname    | sname   |
-+----------+----------+---------+
-| Hoffman  | Hoffman  | Peel    |
-| Clemens  | Hoffman  | Peel    |
-| Giovanni | Giovanni | AxelRod |
-| Liu      | Liu      | Serres  |
-| Grass    | Liu      | Serres  |
-| Liu      | Grass    | Serres  |
-| Grass    | Grass    | Serres  |
-| Hoffman  | Clemens  | Peel    |
-| Clemens  | Clemens  | Peel    |
-| Cisneros | Cisneros | Rifkn   |
-| Pereira  | Pereira  | Motika  |
-+----------+----------+---------+
++---------+---------+
+| cname   | cname   |
++---------+---------+
+| Clemens | Hoffman |
+| Grass   | Liu     |
+| Liu     | Grass   |
+| Hoffman | Clemens |
++---------+---------+
+
 
 46) Write a query that will give you all orders for more than $1000.00.
  
@@ -828,9 +827,11 @@ A) SELECT onum FROM orders WHERE amt is NULL OR amt=0;
 Empty set (0.00 sec)
 
 
+< re review >
+
 55) Produce all combinations of salespeople and customer names such that the former precedes the latter alphabetically, and the latter has a rating of less than 200. 
 
-A) SELECT s.sname,c.cname,c.rating FROM customers c,salespeople s WHERE c.rating<200 GROUP BY s.sname,c.cname,c.rating HAVING c.cname>=s.sname;
+A) SELECT s.sname,c.cname,c.rating FROM customers c,salespeople s WHERE c.rating<200 GROUP BY s.sname,c.cname,c.rating;
 
 +---------+---------+--------+
 | sname   | cname   | rating |
@@ -838,11 +839,23 @@ A) SELECT s.sname,c.cname,c.rating FROM customers c,salespeople s WHERE c.rating
 | AxelRod | Clemens |    100 |
 | AxelRod | Hoffman |    100 |
 | AxelRod | Pereira |    100 |
+| Fran    | Clemens |    100 |
 | Fran    | Hoffman |    100 |
 | Fran    | Pereira |    100 |
+| Motika  | Clemens |    100 |
+| Motika  | Hoffman |    100 |
 | Motika  | Pereira |    100 |
+| Peel    | Clemens |    100 |
+| Peel    | Hoffman |    100 |
 | Peel    | Pereira |    100 |
+| Rifkn   | Clemens |    100 |
+| Rifkn   | Hoffman |    100 |
+| Rifkn   | Pereira |    100 |
+| Serres  | Clemens |    100 |
+| Serres  | Hoffman |    100 |
+| Serres  | Pereira |    100 |
 +---------+---------+--------+
+
 
 
 56) Find all salespeople name and commission. 
@@ -888,33 +901,14 @@ A) SELECT s.sname,c.cname FROM customers c, salespeople s WHERE s.snum=c.snum GR
 
 59) Write a query that produces the names and ratings of all customers who have average orders. 
 
-A) SELECT c.cname, o.amt FROM customers c, orders o WHERE o.amt > (SELECT AVG(amt) FROM orders);
+A) SELECT c.cname, c.rating FROM customers c, orders o WHERE c.cnum=o.cnum AND  o.amt > (SELECT AVG(amt) FROM orders) GROUP BY c.cname, c.rating;
 
-+----------+---------+
-| cname    | amt     |
-+----------+---------+
-| Hoffman  | 5160.45 |
-| Hoffman  | 4723.00 |
-| Hoffman  | 9891.88 |
-| Giovanni | 5160.45 |
-| Giovanni | 4723.00 |
-| Giovanni | 9891.88 |
-| Liu      | 5160.45 |
-| Liu      | 4723.00 |
-| Liu      | 9891.88 |
-| Grass    | 5160.45 |
-| Grass    | 4723.00 |
-| Grass    | 9891.88 |
-| Clemens  | 5160.45 |
-| Clemens  | 4723.00 |
-| Clemens  | 9891.88 |
-| Cisneros | 5160.45 |
-| Cisneros | 4723.00 |
-| Cisneros | 9891.88 |
-| Pereira  | 5160.45 |
-| Pereira  | 4723.00 |
-| Pereira  | 9891.88 |
-+----------+---------+
++---------+--------+
+| cname   | rating |
++---------+--------+
+| Clemens |    100 |
+| Liu     |    200 |
++---------+--------+
 
 
 60) Find the SUM of all Amounts from the orders table. 
@@ -987,18 +981,21 @@ A) SELECT DISTINCT s.comm,s.sname FROM salespeople s LEFT JOIN customers c ON s.
 |   12 | Peel  |
 +------+-------+
 
+<re view>
 
 65) Write a query using ANY or ALL that will find all salespeople who have no customers located in their city.
  
 A) SELECT s.sname FROM salespeople s LEFT JOIN customers c ON s.snum = c.snum WHERE s.city != c.city;
    SELECT snum,sname FROM salespeople WHERE sname NOT IN (SELECT sname FROM salespeople WHERE city = ANY (SELECT city FROM customers));
 
-+------+---------+
-| snum | sname   |
-+------+---------+
-| 1003 | AxelRod |
-| 1007 | Rifkn   |
-+------+---------+
++---------+
+| sname   |
++---------+
+| AxelRod |
+| Serres  |
+| Motika  |
+| Rifkn   |
++---------+
 
 
 66) Write a query using the EXISTS operator that selects all salespeople with customers located in their cities who are not assigned to them.
@@ -1110,17 +1107,17 @@ A) SELECT city, max(rating) FROM customerS GROUP BY city;
 
 74) Write a query that will produce the snum values of all salespeople with orders, having amt greater than 1000 in the Orders Table(without repeats). 
 
-A) SELECT 'for the city 'city,  'the highest rating is ' + max(rating) FROM customers c GROUP BY city;
+A) SELECT S.snum FROM salespeople s, orders o WHERE o.snum = s.snum AND o.amt>1000 GROUP BY s.snum ;
 
-+---------------+----------------------------------------+
-| city          | 'the highest rating is ' + max(rating) |
-+---------------+----------------------------------------+
-| for the city  |                                    300 |
-| for the city  |                                    100 |
-| for the city  |                                    200 |
-| for the city  |                                    300 |
-+---------------+----------------------------------------+
-
++------+
+| snum |
++------+
+| 1001 |
+| 1002 |
+| 1003 |
+| 1004 |
+| 1007 |
++------+
 
 75) Write a query that lists customers in a descending order of rating. Output the rating field first, followed by the customer’s names and numbers. 
 
